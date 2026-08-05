@@ -1,13 +1,9 @@
-/* united hacks v8 — interactions */
 (function () {
   "use strict";
 
   var REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* ---------- page zoom (1440px stage scales to viewport) ---------- */
   function fitStage() {
-    /* clientWidth (not innerWidth): excludes classic scrollbars, so the
-       zoomed stage never overflows the layout viewport on windows */
     var w = document.documentElement.clientWidth;
     var z = w <= 860 ? 1 : Math.min(1, w / 1440);
     document.documentElement.style.setProperty("--page-zoom", z);
@@ -15,7 +11,6 @@
   fitStage();
   window.addEventListener("resize", fitStage);
 
-  /* ---------- countdown to opening ceremony (jan 15 2027, 7pm est) ---------- */
   var KICKOFF = new Date("2027-01-15T19:00:00-05:00").getTime();
   var cdEls = {
     days: document.querySelector('[data-cd="days"]'),
@@ -51,7 +46,6 @@
   tick();
   setInterval(tick, 1000);
 
-  /* ---------- reveal on scroll ---------- */
   var revealEls = document.querySelectorAll(".reveal");
   if ("IntersectionObserver" in window && !REDUCED) {
     var ro = new IntersectionObserver(
@@ -70,7 +64,6 @@
     revealEls.forEach(function (el) { el.classList.add("on"); });
   }
 
-  /* ---------- footer wordmark reveal ---------- */
   var footer = document.querySelector(".footer");
   if (footer) {
     if ("IntersectionObserver" in window && !REDUCED) {
@@ -91,8 +84,6 @@
     }
   }
 
-  /* ---------- faq accordions (whole card is the hit target; the button
-     inside stays for keyboard/AT and its clicks bubble up here) ---------- */
   document.querySelectorAll(".faq-item").forEach(function (item) {
     var btn = item.querySelector(".faq-btn");
     if (!btn) return;
@@ -102,7 +93,6 @@
     });
   });
 
-  /* ---------- prize value blur-in (per character) ---------- */
   document.querySelectorAll(".pr-price").forEach(function (el) {
     var text = el.textContent;
     el.setAttribute("role", "img");
@@ -137,7 +127,6 @@
     }
   }
 
-  /* ---------- installer progress (bar + counter share one trigger) ---------- */
   var installer = document.querySelector(".installer-wrap");
   var pct = document.querySelector(".inst-pct");
   var instMsg = document.querySelector(".inst-msg");
@@ -150,7 +139,6 @@
         if (t0 === null) t0 = ts;
         var el = ts - t0 - DELAY;
         if (el < 0) { requestAnimationFrame(step); return; }
-        /* ease-out matching the css cubic-bezier-ish curve */
         var p = Math.min(1, el / DURATION);
         var eased = 1 - Math.pow(1 - p, 3);
         pct.textContent = Math.round(eased * 100) + "%";
@@ -180,7 +168,6 @@
     }
   }
 
-  /* ---------- pricing sky canvas ---------- */
   var sky = document.querySelector(".pricing-sky");
   if (sky) {
     var ctx = sky.getContext("2d");
@@ -199,7 +186,6 @@
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
-    /* seeded once with normalized coords so resizes rescale instead of teleporting */
     function seedSky() {
       var i;
       for (i = 0; i < 90; i++) {
@@ -246,7 +232,6 @@
         ctx.arc(x, y, s.r, 0, Math.PI * 2);
         ctx.fill();
       }
-      /* soft radial blobs: no hard ellipse edges or seams */
       for (i = 0; i < clouds.length; i++) {
         c = clouds[i];
         c.drift += c.v;
@@ -266,7 +251,6 @@
       ctx.globalAlpha = 1;
     }
 
-    /* only animate while the section is on screen */
     var skyVisible = true;
     var skyRaf = null;
     function loopSky(t) {
@@ -296,7 +280,6 @@
       sizeSky();
       if (REDUCED || skyRaf === null) drawSky(0);
     });
-    /* webfont swaps change section height after load */
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(function () {
         sizeSky();
